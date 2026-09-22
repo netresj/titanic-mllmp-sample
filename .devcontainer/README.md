@@ -1,6 +1,6 @@
 # 開発環境について
 
-Windows、macOS、Linux（Ubuntu）から共通の Ubuntu 24.04 環境を利用するための Dev Container 設定です。言語やフレームワークは固定していません。
+Windows、macOS、Linux（Ubuntu）から共通の Ubuntu 24.04 環境を利用するための Dev Container 設定です。Titanic 分析用に Python 3.12.13 と uv 0.12.16 を使用します。
 
 ## 前提
 
@@ -18,7 +18,7 @@ Windows では Linux コンテナを利用してください。
 2. VS Code でリポジトリのルートを開きます。
 3. 拡張機能画面で `@recommended` を検索し、Microsoft の **Dev Containers**（`ms-vscode-remote.remote-containers`）をホスト側にインストールします。
 4. 左下のリモート接続ボタンから **Reopen in Container** を選ぶか、コマンドパレットから `Dev Containers: Reopen in Container` を実行します。既存環境を更新する場合は `Dev Containers: Rebuild Container` を実行します。
-5. 左下に `Dev Container: Multi-LLM-Project` と表示されたら、拡張機能画面のコンテナ側で Claude Code・Codex・GitHub Copilot の導入を確認し、それぞれサインインします。
+5. 左下に `Dev Container: Titanic Analysis` と表示されたら、拡張機能画面のコンテナ側で Claude Code・Codex・GitHub Copilot の導入を確認し、それぞれサインインします。
 
 Compose を手動で起動する必要はありません。拡張機能が `devcontainer.json` を読み、開発用コンテナとプロキシをまとめて起動します。起動に失敗した場合は `Dev Containers: Show Container Log` で確認してください。
 
@@ -47,7 +47,7 @@ curl -v --fail --head http://registry.npmjs.org
 curl -v --fail --head https://pypi.org/simple/pip/
 ```
 
-ホストのリポジトリルートから状態とアクセスログを確認できます。`compose.yaml` の `name` で Compose のプロジェクト名を `multi-llm-project_devcontainer` に固定しているため、Dev Containers 拡張が起動したコンテナも次のコマンドで操作できます。実際のプロジェクト名は `docker compose ls` で確認できます。
+ホストのリポジトリルートから状態とアクセスログを確認できます。`compose.yaml` の `name` で Compose のプロジェクト名を `titanic-analysis_devcontainer` に固定しているため、Dev Containers 拡張が起動したコンテナも次のコマンドで操作できます。実際のプロジェクト名は `docker compose ls` で確認できます。
 
 ```sh
 docker compose -f .devcontainer/compose.yaml ps
@@ -74,7 +74,7 @@ docker compose -f .devcontainer/compose.yaml logs --tail=50 proxy
 | GitHub Copilot | `.githubcopilot.com`、GitHub 共通ホスト、`default.exp-tas.com` |
 | VS Code Server・拡張機能 | `marketplace.visualstudio.com`、`.gallery.vsassets.io`、`.gallerycdn.vsassets.io`、VS Code 配布用 CDN など |
 
-配布元の根拠は [uv のインストール](https://docs.astral.sh/uv/getting-started/installation/)、[uv の Python 配布物](https://docs.astral.sh/uv/concepts/python-versions/)、[PyPI の Index API](https://docs.pypi.org/api/index-api/)、[npm のレジストリ](https://docs.npmjs.com/cli/v11/using-npm/registry/) を参照してください。この変更は通信先の許可のみで、uv や Node.js 自体はインストールしません。
+配布元の根拠は [uv のインストール](https://docs.astral.sh/uv/getting-started/installation/)、[uv の Python 配布物](https://docs.astral.sh/uv/concepts/python-versions/)、[PyPI の Index API](https://docs.pypi.org/api/index-api/)、[npm のレジストリ](https://docs.npmjs.com/cli/v11/using-npm/registry/) を参照してください。uv は Docker ビルド時に公式イメージから導入します。Node.js は未導入です。
 
 PyPy、Yarn、起動後の Ubuntu パッケージ取得用の候補は、許可リスト内にコメントで用意しています。社内レジストリや npm のインストールスクリプトが取得する追加バイナリ（Playwright、Cypress、Electron など）は、利用するものに応じて追加してください。GitHub Enterprise の独自ドメイン、企業 SSO の IdP、Bedrock・Vertex AI・Azure などの外部モデルプロバイダは別途追加してください。エージェントが Web 検索や外部サイト閲覧でアクセスする宛先も、利用先に応じた追加が必要です。接続が拒否された場合は `docker compose -f .devcontainer/compose.yaml logs --tail=100 proxy` の `TCP_DENIED/403` から宛先を確認できます。
 
@@ -140,3 +140,32 @@ Python 3 と PyYAML は Ubuntu のパッケージとして明示的に導入し�
 - API キーや認証情報をイメージ・設定ファイル・Git に保存しないでください。
 
 Dev Container を使わず、各 OS 上で直接開発することもできます。その場合は必要な開発ツールを個別に用意してください。
+
+## Titanic 分析環境
+
+作成時に共有スキル登録の後で `uv sync --locked` を実行します。Python 3.12.13 は uv が取得し、分析用の `.venv` を作成します。システム Python と PyYAML は共有スキル用に維持します。分析依存に PyYAML を混ぜません。
+
+uv は `ghcr.io/astral-sh/uv:0.12.16` からコピーします。このイメージの取得はビルド時の通信です。起動後の Python と依存の取得先は既存の GitHub・PyPI 許可リストで対応します。Kaggle データはホストで取得して `data/raw/` に配置してください。
+
+ワークスペースは既存の `/workspaces/Multi-LLM-Project` を維持します。Compose 名は `titanic-analysis_devcontainer` に変更したため、旧環境とは別のコンテナになります。ホストのリポジトリは同じものをマウントします。旧環境のコンテナ内だけに保存したファイルがあれば先に取り出し、新環境へ移してください。旧コンテナは自動削除しません。
+
+フロントアプリ・API は未実装のため、アプリの待受ポートや転送ポートはありません。
+
+```sh
+uv --version
+uv sync --locked
+uv run --locked python --version
+uv run --locked python scripts/run_experiment.py --config configs/smoke.json --allow-dirty
+uv run --locked python -m unittest discover -s tests -v
+uv run --locked ruff check scripts tests
+uv run --locked ruff format --check scripts tests
+```
+
+ホストで形式とビルドを確認する場合はルートで実行します。
+
+```sh
+docker compose -f .devcontainer/compose.yaml config --quiet
+docker compose -f .devcontainer/compose.yaml build
+```
+
+ホストとコンテナでは `.venv` を共用できません。既存環境が別 OS 用の場合は退避してから `uv sync --locked` を実行してください。データと実験記録の説明は [README](../README.md) を参照してください。

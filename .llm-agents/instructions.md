@@ -16,16 +16,21 @@
 
 ## プロジェクト固有の情報
 
-雛形を利用する際に、以下をプロジェクトに合わせて書き換えてください。現在の内容はこのテンプレートリポジトリ自体のものです。
-
-- 目的・対象範囲: Claude Code、Codex、GitHub Copilot で共通の指示とスキルを共有するためのテンプレート。アプリケーションのコードは含まない。
-- 使用言語・フレームワーク: Python 3。標準ライブラリと PyYAML のみを使う。
-- セットアップコマンド: `python3 -m venv .venv` の後に `.venv/bin/python -m pip install -r .llm-agents/requirements.txt`。Dev Container には導入済みのため不要。
-- ビルド・テスト・静的解析コマンド: スキルまたは `.llm-agents/scripts/` を変更した場合は、リポジトリのルートで下記を実行する。ビルドと静的解析は未設定。
+- 目的: Kaggle Titanic の仮説検証。Notebook を使わず Python スクリプトで分析する。フロントアプリは後続開発で技術未選定。
+- 技術: Python 3.12.13、uv 0.12.16、pandas、scikit-learn。アプリ依存は `pyproject.toml` と uv が生成する `uv.lock` に記録し、共有スキル用 `.llm-agents/requirements.txt` と分ける。
+- 構成: `scripts/` は実行コード、`configs/` は全パラメータ、`data/` は入力・派生データ、`runs/` は実行記録、`docs/` は検証結果と知見。データと runs の内容は Git 管理外。
+- セットアップ: ルートで `uv sync --locked`。
+- 動作確認: `uv run --locked python scripts/run_experiment.py --config configs/smoke.json --allow-dirty`。人工データの確認であり Titanic の分析ではない。
+- 検証: `uv run --locked python -m unittest discover -s tests -v`、`uv run --locked ruff check scripts tests`、`uv run --locked ruff format --check scripts tests`。
+- スクリプトは必ず実行基盤経由で動かし、全パラメータ・seed・全入力ファイルを設定に明示する。ログ、環境、Git、入力ハッシュ、分割、指標を記録する。正式な検証はコミット済みコードで行い、正の `--issue` 番号を必須とする。入力はリポジトリ内を指す相対パスに限定する。
+- 仮説は Issue に登録し、1検証サイクルを `experiment/<issue番号>-<短い説明>` ブランチで扱う。複数 run は同じサイクルに含めてよい。
+- 結果を `docs/experiments/` に、得られた知見へのリンクを `docs/insights.md` に残す。否定・判定不能も記録する。評価データのリークを防ぎ、比較する実験では同じ分割を使う。
+- PR・push 時は `.github/workflows/checks.yml` で Ruff・テスト・Notebook の混入を確認する。Notebook を `.gitignore` で隠さない。
+- 日本語のドキュメント・コメントでは句点「。」と読点「、」を使う。秘密情報を設定・ログ・Git に含めない。
+- 詳細な記録仕様・再現手順は `docs/README.md` を参照する。
+- スキルや `.llm-agents/scripts/` 変更時は、PyYAML のあるシステム Python（Dev Container は導入済み）で次も実行する。ホストでは共有スキル用に別の仮想環境を用意する。
 
   ```sh
   python3 -m unittest discover -s .llm-agents/tests
   python3 .llm-agents/scripts/register-skills.py --check
   ```
-
-- コーディング規約: ドキュメントとコメントは日本語とし、句点は `。`、読点は `、` を使う。Python は標準ライブラリを優先し、依存を追加する場合は `.llm-agents/requirements.txt` に明記する。

@@ -1,69 +1,62 @@
-# Multi-LLM-Project
+# Titanic Analysis
 
-## このリポジトリについて
+Kaggle Titanic の仮説を Python スクリプトで検証するプロジェクトです。Notebook は使用しません。実験の設定・ログ・環境・結果を保存し、Issue、検証ブランチ、知見を結び付けます。
 
-このリポジトリは、複数の LLM を VS Code のコーディングエージェントで利用するためのテンプレートリポジトリです。
-対象とする LLM サービスは Claude Code、Codex、GitHub Copilot です。
-Windows、macOS、Linux（Ubuntu）での開発を対象とします。
+## 現在の範囲
 
-## はじめ方
+実験の記録基盤、人工データでの動作確認、仮説・結果のテンプレートを用意しています。Titanic の前処理・学習・提出ファイル生成と、可視化するフロントアプリは後続開発です。フロントの技術は未選定です。
 
-1. このリポジトリをテンプレートとして利用するか、クローンします。Windows で直接クローンする場合は、スキル登録用のシンボリックリンクを保持するため [Windows での利用](.llm-agents/README.md#windows-での利用) を先に確認してください。
-2. VS Code でリポジトリのルートを開き、必要な推奨拡張機能をインストールします。
-3. 利用する Claude Code、Codex、GitHub Copilot のアカウントでサインインします。
-4. [共通ルール](AGENTS.md) を確認し、[共通プロンプト](.llm-agents/instructions.md) のプロジェクト固有の情報を更新します。対話で設定する場合は、下記の `setup-project` を利用できます。
-5. 共通のコンテナ環境を使う場合は、[Dev Container の手順](.devcontainer/README.md) に従います。
+## 技術と構成
 
-## 対話でプロジェクトを設定する
-
-[setup-project](.llm-agents/skills/setup-project/SKILL.md) に開発したいものの目的や技術スタックを伝えると、不足する要件を対話で整理し、Dev Container、共通プロンプト、README などを更新します。
-
-例えば「このリポジトリの setup-project スキルを使って、本の貸出管理アプリの開発環境を設定してください」と依頼できます。
-
-エージェント別の記法や候補に出ない場合の対処は、[コマンドで呼び出す](.llm-agents/README.md#コマンドで呼び出す) を参照してください。
-
-## ディレクトリ構成
+Python 3.12.13、uv 0.12.16、pandas、scikit-learn を使用し、依存を `uv.lock` に固定します。記録は JSON とログファイルで保存します。
 
 ```text
-.
-├── AGENTS.md                       # 共通ルールの正本・Codex の入口
-├── CLAUDE.md                       # Claude Code の入口
-├── LICENSE
-├── .github/
-│   └── copilot-instructions.md     # GitHub Copilot の入口
-├── .llm-agents/
-│   ├── README.md                   # エージェント構成の説明
-│   ├── instructions.md             # 共通プロンプトの本体
-│   ├── requirements.txt            # 登録スクリプトの依存（PyYAML）
-│   ├── skills/                     # スキルの本体の配置先
-│   ├── agents/                     # エージェント定義の本体の配置先
-│   ├── tmp/                        # 必要時に作成するローカルの一時記録（Git 管理対象外）
-│   ├── scripts/
-│   │   └── register-skills.py      # 探索場所へのリンクの登録・検証
-│   └── tests/
-│       └── test_register_skills.py # 登録スクリプトの回帰テスト
-├── .claude/skills/                 # Claude Code・Copilot の探索場所（本体へのリンク）
-├── .agents/skills/                 # Codex の探索場所（本体へのリンク）
-├── .devcontainer/
-│   ├── README.md                   # 開発環境の説明
-│   ├── devcontainer.json           # Ubuntu ベースの共通環境
-│   ├── compose.yaml                # 開発用コンテナとプロキシの起動定義
-│   ├── Dockerfile                  # RTK・検索補助ツールの導入
-│   └── proxy/                      # Squid によるドメインの許可・拒否
-│       ├── Dockerfile
-│       ├── entrypoint.sh           # リストから ACL を生成
-│       ├── squid.conf
-│       └── lists/                  # whitelist.txt・blacklist.txt
-└── .vscode/
-    ├── extensions.json             # 推奨拡張機能
-    └── settings.json               # ワークスペース設定
+configs/                 # Git 管理する実験設定
+scripts/                 # 実行基盤・分析用 Python スクリプト
+tests/                   # 実験基盤の検証
+data/raw/                # 手動配置する原本（Git 管理外）
+data/processed/          # 派生データ（Git 管理外）
+runs/<run-id>/           # 実験ログ・環境・結果（Git 管理外）
+docs/experiments/        # 仮説検証ごとの結果
+docs/insights.md         # 知見の索引
+.github/ISSUE_TEMPLATE/  # 仮説の登録様式
+.devcontainer/          # 開発環境・プロキシ
+.llm-agents/             # 共通指示・共有スキル
 ```
 
-共通プロンプトは1ファイルに集約し、各エージェントの入口から参照します。アプリケーションの言語やディレクトリ構成は、利用するプロジェクトに合わせて追加してください。
+## セットアップと実行
 
-共有スキルを追加する場合は、いずれのエージェントでも「このリポジトリの `create-shared-skill` スキルを使って、○○用のスキルを作成してください」と依頼できます。作成したスキルは共通ディレクトリに配置され、他のエージェントでも同じ本体を読み込んで利用できます。
+[開発環境の手順](.devcontainer/README.md) に従い `Dev Containers: Rebuild Container` を実行してください。作成時に共有スキル登録と `uv sync --locked` を実行します。
 
-エージェントについての詳細は [.llm-agents/README.md](.llm-agents/README.md) を参照してください。
-開発環境についての詳細は [.devcontainer/README.md](.devcontainer/README.md) を参照してください。
+ホストの場合は uv 0.12.16 を用意し、以下をリポジトリルートで実行します。Python は `.python-version` に従って uv が用意します。
 
-共有スキル作成コマンドは Claude Code・Copilot では `/create-shared-skill`、Codex では `$create-shared-skill` です。[登録と呼び出しの手順](.llm-agents/README.md#コマンドで呼び出す) を参照してください。
+ホストとコンテナの `.venv` は共用できません。別環境で作った `.venv` が残っている場合は、Git 管理外の `.llm-agents/tmp/` などに退避してから同期してください。
+
+```sh
+uv sync --locked
+uv run --locked python scripts/run_experiment.py --config configs/smoke.json --allow-dirty
+uv run --locked python -m unittest discover -s tests -v
+uv run --locked ruff check scripts tests
+uv run --locked ruff format --check scripts tests
+```
+
+動作確認には Kaggle データも認証情報も不要です。表示された `runs/<run-id>/run.log` に実行中から標準出力・標準エラーを保存します。`tail -f runs/<run-id>/run.log` で確認できます。指標は人工データの結果であり、Titanic の性能ではありません。
+
+データは Kaggle から自身で取得し、`data/raw/train.csv`、`data/raw/test.csv` に配置します。データ取得・提出は自動化していません。原本は上書きせず保管してください。
+
+## 仮説検証の進め方
+
+1. Issue の「仮説検証」で、仮説・根拠・評価方法・判定基準を登録します。
+2. 1サイクルにつき `experiment/<issue番号>-<短い説明>` ブランチを作ります。同じサイクル内で複数回実験できます。
+3. スクリプトと設定を作成し、入力一覧・seed・全パラメータを明示してコミットします。
+4. `uv run --locked python scripts/run_experiment.py --config configs/<設定>.json --issue <番号>` で実行します。
+5. [結果テンプレート](docs/experiments/_template.md) を `docs/experiments/<issue番号>-<短い説明>.md` にコピーし、結果・解釈・限界を記録します。[知見の索引](docs/insights.md) も更新します。
+6. PR に Issue と結果文書を関連付け、レビュー後にマージします。次の仮説は新しい Issue・ブランチに分けます。
+
+成果物は Git 管理外です。共有・長期保存する run ディレクトリと入力データは別途保管し、文書に保存先を記載します。
+
+記録形式・再現方法は [実験基盤の説明](docs/README.md)、共通ルールは [AGENTS.md](AGENTS.md)、エージェント設定は [.llm-agents/README.md](.llm-agents/README.md) を参照してください。依存の同期方法は [uv 公式資料](https://docs.astral.sh/uv/concepts/projects/sync/) に基づきます。
+
+## CI
+
+PR と push 時に `.github/workflows/checks.yml` が依存の同期、Ruff、実験基盤のテスト、Git 管理された Notebook の混入確認を実行します。CI 設定は [uv の公式ガイド](https://docs.astral.sh/uv/guides/integration/github/) を参照しています。

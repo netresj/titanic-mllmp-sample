@@ -1,5 +1,5 @@
 # Dev Containers 拡張とホストからの docker compose で同じプロジェクト名を使う。
-name: multi-llm-project_devcontainer
+name: titanic-analysis_devcontainer
 
 services:
   devcontainer:

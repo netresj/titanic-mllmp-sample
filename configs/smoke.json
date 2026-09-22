@@ -1,0 +1,6 @@
+{
+  "script": "scripts/smoke.py",
+  "seed": 42,
+  "inputs": [],
+  "parameters": {"rows": 100, "test_size": 0.2}
+}

@@ -1,0 +1,16 @@
+[project]
+name = "titanic-analysis"
+version = "0.1.0"
+description = "Titanic の仮説検証と再現可能な実験記録"
+requires-python = ">=3.12,<3.13"
+dependencies = ["numpy>=2,<3", "pandas>=2.2,<3", "scikit-learn>=1.5,<2"]
+
+[dependency-groups]
+dev = ["ruff>=0.11,<1"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

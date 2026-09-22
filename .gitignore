@@ -14,3 +14,13 @@ Thumbs.db
 
 # 同じ作業環境のエージェント間で参照する一時ファイル
 .llm-agents/tmp/
+
+# 実験データ・成果物・ローカルキャッシュ
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+runs/*
+!runs/.gitkeep
+.ruff_cache/
+.pytest_cache/
