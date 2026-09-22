@@ -1,0 +1,25 @@
+{
+  "name": "Multi-LLM-Project",
+  "dockerComposeFile": "compose.yaml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/Multi-LLM-Project",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "vscode",
+  "postCreateCommand": "python3 .llm-agents/scripts/register-skills.py",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "http.proxy": "http://proxy:3128",
+        "http.proxySupport": "override",
+        "http.proxyStrictSSL": true,
+        "http.noProxy": ["localhost", "127.0.0.1", "::1", "proxy", "devcontainer"]
+      },
+      "extensions": [
+        "anthropic.claude-code",
+        "openai.chatgpt",
+        "github.copilot",
+        "github.copilot-chat"
+      ]
+    }
+  }
+}

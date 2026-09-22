@@ -1,0 +1,34 @@
+# Dev Containers 拡張とホストからの docker compose で同じプロジェクト名を使う。
+name: multi-llm-project_devcontainer
+
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    volumes:
+      - ..:/workspaces/Multi-LLM-Project:cached
+    environment:
+      HTTP_PROXY: http://proxy:3128
+      HTTPS_PROXY: http://proxy:3128
+      http_proxy: http://proxy:3128
+      https_proxy: http://proxy:3128
+      NO_PROXY: localhost,127.0.0.1,::1,proxy,devcontainer
+      no_proxy: localhost,127.0.0.1,::1,proxy,devcontainer
+    depends_on:
+      proxy:
+        condition: service_healthy
+
+  proxy:
+    build:
+      context: ./proxy
+    volumes:
+      - ./proxy/lists:/etc/squid/lists:ro
+    # ホストには公開せず、Compose 内のコンテナからのみ利用する。
+    healthcheck:
+      test: ["CMD", "curl", "--noproxy", "*", "--fail", "--silent", "http://127.0.0.1:3128/squid-internal-mgr/info"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s

@@ -1,0 +1,82 @@
+# 許可するドメインを1行に1つ記載する。空行と # 以降は無視する。
+# 有効な行がない場合は、ブラックリスト以外を許可する。
+# 先頭のドットでドメイン自身とサブドメインを含める。
+# 登録済みのホストだけを許可する。追加の配布元はアクセスログを確認して追記する。
+
+# Python パッケージ: PyPI のインデックスと wheel / ソース配布物。
+pypi.org
+files.pythonhosted.org
+
+# uv のインストーラ。
+astral.sh
+releases.astral.sh
+
+# GitHub: HTTPS Git・API・認証・Releases・LFS・画面用アセット。
+# uv / CPython の配布物・GitHub 依存・nvm の取得先も含む。
+.github.com
+.githubusercontent.com
+.githubassets.com
+github-cloud.s3.amazonaws.com
+
+# GitHub Copilot: 全プランの API・補完・Chat・実験設定。
+# 契約プランごとに通信を制限する場合は githubcopilot.com の範囲を絞る。
+.githubcopilot.com
+default.exp-tas.com
+
+# Claude Code: API・認証・インストーラ・更新・ドキュメント。
+api.anthropic.com
+console.anthropic.com
+claude.ai
+downloads.claude.ai
+claude.com
+platform.claude.com
+code.claude.com
+# プラグインのメタデータと旧バージョンのネイティブ配布先。
+storage.googleapis.com
+# Claude のコネクタ・ブラウザ連携・Artifact 用。
+# 通信先の許可は MCP ツール利用の承認を代替しない。
+mcp-proxy.anthropic.com
+bridge.claudeusercontent.com
+.frame.claudeusercontent.com
+
+# Codex: ChatGPT 認証・推論、API キー認証、配布物・静的コンテンツ。
+.chatgpt.com
+api.openai.com
+.auth.openai.com
+auth0.openai.com
+platform.openai.com
+cdn.openai.com
+.oaistatic.com
+.oaiusercontent.com
+challenges.cloudflare.com
+
+# VS Code: Server・拡張機能の取得、認証コールバック。
+update.code.visualstudio.com
+code.visualstudio.com
+go.microsoft.com
+marketplace.visualstudio.com
+.gallery.vsassets.io
+.gallerycdn.vsassets.io
+.vscode-cdn.net
+vscode.download.prss.microsoft.com
+download.visualstudio.microsoft.com
+vscode.dev
+.vscode-unpkg.net
+
+# Node.js 本体・node-gyp 用ヘッダ・npm の公開レジストリ。
+nodejs.org
+registry.npmjs.org
+
+# 以下は必要な場合だけコメントを外す。
+# Python 公式配布物・PyPy:
+# www.python.org
+# downloads.python.org
+# pip のブートストラップ:
+# bootstrap.pypa.io
+# Yarn のレジストリを参照する既存 lockfile:
+# registry.yarnpkg.com
+# GitHub Packages の npm レジストリは .github.com に含まれる。
+# Ubuntu パッケージ（起動後の apt 利用）:
+# archive.ubuntu.com
+# security.ubuntu.com
+# ports.ubuntu.com

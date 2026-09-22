@@ -1,0 +1,16 @@
+.env
+.env.local
+
+.mypy_cache/
+__pycache__/
+.venv/
+
+# エージェントがローカルに生成する設定
+.claude/settings.local.json
+
+# OS が生成するファイル
+.DS_Store
+Thumbs.db
+
+# 同じ作業環境のエージェント間で参照する一時ファイル
+.llm-agents/tmp/

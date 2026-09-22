@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "anthropic.claude-code",
+    "openai.chatgpt",
+    "github.copilot",
+    "github.copilot-chat",
+    "ms-vscode-remote.remote-containers"
+  ]
+}
